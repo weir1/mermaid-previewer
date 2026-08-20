@@ -42,6 +42,7 @@
                 // Render the diagram
                 const { svg } = await mermaid.render('mermaid-svg', code);
                 previewContainer.innerHTML = svg;
+                window.currentMermaidSvg = svg;
 
                 // Show overlay
                 overlay.style.display = 'flex';
@@ -124,6 +125,57 @@
             if (!document.fullscreenElement) {
                 fullscreenBtn.textContent = "Go Fullscreen";
             }
+        });
+
+        // Download Image Feature
+        const downloadBtn = document.getElementById('download-btn');
+        downloadBtn.addEventListener('click', () => {
+            if (!window.currentMermaidSvg) return;
+
+            // Create a temporary div to parse the original SVG string
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = window.currentMermaidSvg;
+            const svgEl = tempDiv.querySelector('svg');
+            if (!svgEl) return;
+
+            // Parse dimensions
+            let width, height;
+            const viewBox = svgEl.getAttribute('viewBox');
+            if (viewBox) {
+                const parts = viewBox.split(' ');
+                width = parseFloat(parts[2]);
+                height = parseFloat(parts[3]);
+            } else {
+                width = parseFloat(svgEl.getAttribute('width') || '800');
+                height = parseFloat(svgEl.getAttribute('height') || '600');
+            }
+
+            // Define scale for high-quality export
+            const scale = 3;
+            svgEl.setAttribute('width', width * scale);
+            svgEl.setAttribute('height', height * scale);
+
+            // Remove style attribute that restricts width/height (max-width)
+            svgEl.removeAttribute('style');
+
+            const svgData = new XMLSerializer().serializeToString(svgEl);
+            const canvas = document.createElement('canvas');
+            canvas.width = width * scale;
+            canvas.height = height * scale;
+            const ctx = canvas.getContext('2d');
+
+            const img = new Image();
+            img.onload = () => {
+                ctx.fillStyle = 'white'; // White background
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+
+                const link = document.createElement('a');
+                link.download = 'mermaid-diagram.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+            img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
         });
 
         // Drag and Drop File Support
@@ -390,6 +442,7 @@
         <div id="overlay-header">
             <h3>Mermaid Fullscreen Preview</h3>
             <div class="header-buttons">
+                <button id="download-btn" class="secondary-btn">Download Image</button>
                 <button id="fullscreen-btn" class="secondary-btn">Go Fullscreen</button>
                 <button id="close-btn">Close</button>
             </div>

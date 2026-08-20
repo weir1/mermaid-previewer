@@ -1,3 +1,9 @@
+---
+version: 3.9.0
+updated: 2026-08-20 12:15 IST
+revisions: 2
+updated_basis: git
+---
 # Mermaid Previewer 🧜‍♀️
 
 A lightning-fast, zero-setup local tool for instantly previewing [Mermaid](https://mermaid.js.org/) diagrams on your Mac. Built to solve the pain of squished, unreadable diagrams in typical split-pane web editors, this tool gives you a distraction-free, full-screen canvas with native pan, zoom, and desktop-app support.
