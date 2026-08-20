@@ -157,27 +157,49 @@
             }
         });
 
-        // Keyboard Arrow Panning
+        // Keyboard Shortcuts
         document.addEventListener('keydown', (e) => {
-            if (overlay.style.display === 'flex' && panZoomInstance) {
-                const panStep = 50; // pixels to pan per keypress
-                switch (e.key) {
-                    case 'ArrowLeft':
-                        panZoomInstance.panBy({x: panStep, y: 0});
-                        e.preventDefault();
-                        break;
-                    case 'ArrowRight':
-                        panZoomInstance.panBy({x: -panStep, y: 0});
-                        e.preventDefault();
-                        break;
-                    case 'ArrowUp':
-                        panZoomInstance.panBy({x: 0, y: panStep});
-                        e.preventDefault();
-                        break;
-                    case 'ArrowDown':
-                        panZoomInstance.panBy({x: 0, y: -panStep});
-                        e.preventDefault();
-                        break;
+            // Cmd+Enter or Ctrl+Enter to trigger preview from editor
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                previewBtn.click();
+                return;
+            }
+
+            if (overlay.style.display === 'flex') {
+                // F key to toggle fullscreen
+                if (e.key.toLowerCase() === 'f') {
+                    e.preventDefault();
+                    fullscreenBtn.click();
+                    return;
+                }
+
+                // Escape to close preview (unless in browser fullscreen, which browser handles)
+                if (e.key === 'Escape' && !document.fullscreenElement) {
+                    closeBtn.click();
+                    return;
+                }
+
+                if (panZoomInstance) {
+                    const panStep = 50; // pixels to pan per keypress
+                    switch (e.key) {
+                        case 'ArrowLeft':
+                            panZoomInstance.panBy({x: panStep, y: 0});
+                            e.preventDefault();
+                            break;
+                        case 'ArrowRight':
+                            panZoomInstance.panBy({x: -panStep, y: 0});
+                            e.preventDefault();
+                            break;
+                        case 'ArrowUp':
+                            panZoomInstance.panBy({x: 0, y: panStep});
+                            e.preventDefault();
+                            break;
+                        case 'ArrowDown':
+                            panZoomInstance.panBy({x: 0, y: -panStep});
+                            e.preventDefault();
+                            break;
+                    }
                 }
             }
         });
@@ -254,6 +276,31 @@
             white-space: pre-wrap;
         }
 
+        /* Guide Styles */
+        .guide {
+            margin-top: 20px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+        .guide h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .guide ul {
+            margin: 0;
+            padding-left: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .guide li {
+            margin-bottom: 4px;
+        }
+
         /* Fullscreen Overlay Styles */
         #fullscreen-overlay {
             position: fixed;
@@ -323,8 +370,20 @@
     <div class="container">
         <h2>Paste Mermaid Code</h2>
         <textarea id="editor" placeholder="Paste your Mermaid code here, or drag and drop a .mmd/.txt file..."></textarea>
-        <button id="preview-btn">Show Full Preview</button>
+        <button id="preview-btn">Show Full Preview (Cmd+Enter)</button>
         <div id="error"></div>
+
+        <div class="guide">
+            <h4>💡 Quick Guide</h4>
+            <ul>
+                <li><strong>Cmd + Enter:</strong> Show Preview</li>
+                <li><strong>Drag & Drop:</strong> Load a `.mmd` or `.txt` file</li>
+                <li><strong>F:</strong> Toggle Fullscreen (while in preview)</li>
+                <li><strong>Esc:</strong> Close Preview</li>
+                <li><strong>Arrows / Scroll:</strong> Pan around diagram</li>
+                <li><strong>Cmd + Scroll / Pinch:</strong> Zoom diagram</li>
+            </ul>
+        </div>
     </div>
 
     <div id="fullscreen-overlay">
