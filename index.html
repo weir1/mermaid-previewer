@@ -26,8 +26,47 @@
         const clearBtn = document.getElementById('clear-btn');
         const pasteBtn = document.getElementById('paste-btn');
 
+        // Shareable URLs and Auto-save
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#code=')) {
+                try {
+                    const base64 = hash.substring(6);
+                    const code = decodeURIComponent(escape(atob(base64)));
+                    editor.value = code;
+                    // Note: Don't auto-click previewBtn here because it might fire before mermaid loads
+                    // We'll just populate the editor and let the user click
+                } catch (e) {
+                    console.error("Invalid shareable URL", e);
+                }
+            } else {
+                const saved = localStorage.getItem('mermaid-code');
+                if (saved) {
+                    editor.value = saved;
+                }
+            }
+        });
+
+        let debounceTimer;
+        editor.addEventListener('input', () => {
+            const code = editor.value;
+            localStorage.setItem('mermaid-code', code);
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (code.trim()) {
+                    try {
+                        const base64 = btoa(unescape(encodeURIComponent(code)));
+                        history.replaceState(null, '', '#code=' + base64);
+                    } catch (e) { console.error(e); }
+                } else {
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            }, 1000);
+        });
+
         clearBtn.addEventListener('click', () => {
             editor.value = '';
+            editor.dispatchEvent(new Event('input'));
             editor.focus();
         });
 
@@ -35,6 +74,7 @@
             try {
                 const text = await navigator.clipboard.readText();
                 editor.value = text;
+                editor.dispatchEvent(new Event('input'));
                 editor.focus();
             } catch (err) {
                 alert('Failed to read clipboard contents. Please ensure clipboard permissions are granted.');
@@ -276,6 +316,7 @@
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     editor.value = event.target.result;
+                    editor.dispatchEvent(new Event('input'));
                 };
                 reader.readAsText(file);
             }
