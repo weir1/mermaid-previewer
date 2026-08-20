@@ -1,0 +1,8 @@
+{
+  "name": "moin-mermaid-previewer",
+  "version": "0.1.0",
+  "description": "A live-preview environment for Mermaid diagram code.",
+  "scripts": {
+    "start": "python3 run.py"
+  }
+}

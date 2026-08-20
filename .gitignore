@@ -14,3 +14,4 @@ __pycache__/
 *.log
 MermaidPreviewer.app
 .DS_Store
+.vercel
