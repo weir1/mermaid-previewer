@@ -1,3 +1,9 @@
+---
+version: 3.9.0
+updated: 2026-08-20 11:53 IST
+revisions: 2
+updated_basis: git
+---
 # Mermaid Previewer
 
 A simple local tool to instantly preview Mermaid diagrams on a Mac.

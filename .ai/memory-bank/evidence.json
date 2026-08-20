@@ -1,16 +1,14 @@
 {
-  "timestamp": "2026-08-20T06:21:13Z",
-  "validated_at": "2026-08-20T06:21:13Z",
+  "timestamp": "2026-08-20T06:42:51Z",
+  "validated_at": "2026-08-20T06:42:51Z",
   "pipeline": "safe",
-  "commit": "pre-commit",
-  "status": "failed",
-  "exit_code": 1,
+  "commit": "5302cbe",
+  "status": "passed",
+  "exit_code": 0,
   "task_id": "",
-  "message": "Validation step failed (exit 1) — gate blocked.",
-  "failed_stage": "pre-commit",
-  "failed_checks": ["trim trailing whitespace"],
+  "message": "All machine-enforced gates successfully cleared.",
   "spec_hashes": {
-    "prd.md":     { "hash": "",     "verified_at": "2026-08-20T06:21:13Z" },
-    "roadmap.md": { "hash": "", "verified_at": "2026-08-20T06:21:13Z" }
+    "prd.md":     { "hash": "",     "verified_at": "2026-08-20T06:42:51Z" },
+    "roadmap.md": { "hash": "", "verified_at": "2026-08-20T06:42:51Z" }
   }
 }

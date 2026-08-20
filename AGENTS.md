@@ -1,7 +1,7 @@
 ---
-version: 3.7.0
-updated: 2026-08-18 16:06 IST
-revisions: 25
+version: 3.9.0
+updated: 2026-08-20 11:53 IST
+revisions: 2
 updated_basis: git
 ---
 # God Mode AI OS — Context Workspace Protocol (CANONICAL)

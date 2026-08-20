@@ -1,9 +1,13 @@
 ---
-last_verified: 2026-08-20T06:20:02Z
+last_verified: 2026-08-20T06:21:29Z
 ttl_days: 30
 confidence: bootstrap
 freshness: fresh
 age_days: 0
+version: 3.9.0
+updated: 2026-08-20 11:53 IST
+revisions: 2
+updated_basis: git
 ---
 
 # 🗺️ MEMORY INDEX — read me FIRST, then open the one file you need
