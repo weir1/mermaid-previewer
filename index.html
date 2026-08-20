@@ -57,7 +57,34 @@
                         fit: true,
                         center: true,
                         minZoom: 0.1,
-                        maxZoom: 50
+                        maxZoom: 50,
+                        mouseWheelZoomEnabled: false, // Disable default to override with custom wheel logic
+                        customEventsHandler: {
+                            init: function(options) {
+                                this.wheelListener = function(e) {
+                                    e.preventDefault();
+                                    if (e.ctrlKey || e.metaKey) {
+                                        // Pinch-to-zoom or Ctrl+Scroll
+                                        // deltaY is negative when zooming in
+                                        const zoomFactor = 1 - (e.deltaY * 0.01);
+                                        options.instance.zoomAtPoint(
+                                            options.instance.getZoom() * zoomFactor,
+                                            {x: e.clientX, y: e.clientY}
+                                        );
+                                    } else {
+                                        // Two-finger scroll to pan
+                                        options.instance.panBy({
+                                            x: -e.deltaX,
+                                            y: -e.deltaY
+                                        });
+                                    }
+                                };
+                                options.svgElement.addEventListener('wheel', this.wheelListener, {passive: false});
+                            },
+                            destroy: function(options) {
+                                options.svgElement.removeEventListener('wheel', this.wheelListener);
+                            }
+                        }
                     });
                 }
             } catch (err) {
