@@ -20,6 +20,12 @@
         const closeBtn = document.getElementById('close-btn');
         const previewContainer = document.getElementById('preview-container');
         const errorMsg = document.getElementById('error');
+        const selectAllBtn = document.getElementById('select-all-btn');
+
+        selectAllBtn.addEventListener('click', () => {
+            editor.focus();
+            editor.select();
+        });
 
         function preprocessMermaid(code) {
             let lines = code.split('\n');
@@ -328,9 +334,13 @@
             border-color: #007bff;
             background: #ffffff;
         }
-        #preview-btn {
+        .editor-actions {
+            display: flex;
+            gap: 15px;
             margin-top: 20px;
-            align-self: flex-end;
+            justify-content: flex-end;
+        }
+        #preview-btn {
             background: #007bff;
             color: white;
             border: none;
@@ -343,6 +353,20 @@
         }
         #preview-btn:hover {
             background: #0056b3;
+        }
+        #select-all-btn {
+            background: #e2e6ea;
+            color: #333;
+            border: 1px solid #dae0e5;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #select-all-btn:hover {
+            background: #dae0e5;
         }
         #error {
             color: #d9534f;
@@ -450,7 +474,10 @@
     <div class="container">
         <h2>Paste Mermaid Code</h2>
         <textarea id="editor" placeholder="Paste your Mermaid code here, or drag and drop a .mmd/.txt file..."></textarea>
-        <button id="preview-btn">Show Full Preview (Cmd+Enter)</button>
+        <div class="editor-actions">
+            <button id="select-all-btn">Select All</button>
+            <button id="preview-btn">Show Full Preview (Cmd+Enter)</button>
+        </div>
         <div id="error"></div>
 
         <div class="guide">
