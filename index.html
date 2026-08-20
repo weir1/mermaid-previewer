@@ -17,6 +17,8 @@
         const preview = document.getElementById('preview');
         const errorMsg = document.getElementById('error');
         const instruction = document.getElementById('instruction');
+        const pasteBtn = document.getElementById('paste-btn');
+        const hiddenInput = document.getElementById('hidden-input');
 
         let panZoomInstance = null;
 
@@ -55,16 +57,42 @@
             }
         }
 
-        // Listen for global paste events
-        document.addEventListener('paste', (e) => {
+        // 1. Listen for global paste events (Cmd+V)
+        window.addEventListener('paste', (e) => {
             const pastedText = (e.clipboardData || window.clipboardData).getData('text');
             if (pastedText) {
                 renderDiagram(pastedText);
             }
         });
 
-        // Initial sample render to show it works
-        const sample = `graph TD\n    A[Paste your code anywhere] --> B{Cmd + V}\n    B --> C[See it full screen!]`;
+        // 2. Button for explicitly reading clipboard
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    renderDiagram(text);
+                } else {
+                    alert("Clipboard is empty or contains no text.");
+                }
+            } catch (err) {
+                // Fallback for browsers that block clipboard API
+                hiddenInput.style.display = 'block';
+                hiddenInput.focus();
+                alert("Please press Cmd+V to paste into the box.");
+            }
+        });
+
+        // 3. Fallback hidden input just in case
+        hiddenInput.addEventListener('input', (e) => {
+            if (hiddenInput.value) {
+                renderDiagram(hiddenInput.value);
+                hiddenInput.value = '';
+                hiddenInput.style.display = 'none';
+            }
+        });
+
+        // Initial sample render
+        const sample = `graph TD\n    A[Click 'Paste from Clipboard' below] --> B{Or press Cmd + V}\n    B --> C[See it full screen!]`;
         renderDiagram(sample);
 
     </script>
@@ -94,7 +122,7 @@
         }
         #error {
             position: absolute;
-            bottom: 20px;
+            bottom: 80px;
             left: 20px;
             right: 20px;
             color: #d9534f;
@@ -117,16 +145,46 @@
             align-items: center;
             justify-content: center;
         }
-        /* Make svg take full available space so pan-zoom can work properly */
         svg {
             width: 100%;
             height: 100%;
         }
+        #paste-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 200;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        #paste-btn:hover {
+            background: #0056b3;
+        }
+        #hidden-input {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 300;
+            display: none;
+            padding: 10px;
+            width: 300px;
+        }
     </style>
 </head>
 <body>
-    <div id="instruction">⌘ + V (or Ctrl + V) anywhere to paste your Mermaid code</div>
+    <div id="instruction">Paste your Mermaid code to render</div>
     <div id="error"></div>
     <div id="preview"></div>
+    <button id="paste-btn">📋 Paste from Clipboard</button>
+    <textarea id="hidden-input" placeholder="Paste here (Cmd+V)"></textarea>
 </body>
 </html>
