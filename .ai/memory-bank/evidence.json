@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-08-20T06:21:13Z",
+  "validated_at": "2026-08-20T06:21:13Z",
+  "pipeline": "safe",
+  "commit": "pre-commit",
+  "status": "failed",
+  "exit_code": 1,
+  "task_id": "",
+  "message": "Validation step failed (exit 1) — gate blocked.",
+  "failed_stage": "pre-commit",
+  "failed_checks": ["trim trailing whitespace"],
+  "spec_hashes": {
+    "prd.md":     { "hash": "",     "verified_at": "2026-08-20T06:21:13Z" },
+    "roadmap.md": { "hash": "", "verified_at": "2026-08-20T06:21:13Z" }
+  }
+}

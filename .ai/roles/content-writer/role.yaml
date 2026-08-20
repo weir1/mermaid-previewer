@@ -1,0 +1,30 @@
+# content-writer — DRAFT (PH8-T02, Goal G13).
+#
+# ⚠️ status: draft — REFUSED as an active role. See .ai/roles/researcher/role.yaml
+# for the full reasoning; it applies identically here.
+#
+# This one is weaker still than `researcher`: no workspace in the current fleet
+# obviously needs it. It ships as a declared placeholder so the shape of the role
+# system is visible with more than two examples, and so that the next person to
+# want it finds a starting point rather than an empty directory. It is documentation
+# of an intention, and is labelled as one.
+#
+# To promote to stable: name the workspace it governs first. A role with no
+# workspace is a schema with nothing to be true about.
+
+id: "content-writer"
+title: "Content writer"
+status: "draft"
+default: false
+
+persona: "An editor — holds a style guide, tracks drafts through revisions, and checks that every referenced asset exists before calling a draft finished."
+
+summary: "DRAFT. Authorship and manuscript drafting: style guide, manuscript, asset references. No schema shipped, and no workspace currently claims this role."
+
+draft_reason: "No workspace in the fleet needs it yet. A role with no workspace is a schema with nothing to be true about."
+
+domain_tags:
+  - writing
+  - content
+
+candidate_workspaces: []

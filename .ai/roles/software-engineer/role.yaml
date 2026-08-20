@@ -1,0 +1,31 @@
+# software-engineer — the default role (PH8-T02, Goal G13).
+#
+# This pack is DESCRIPTIVE, not aspirational: it writes down what the OS already
+# did for every workspace before role packs existed. A workspace that declares no
+# `role_pack:` in .ai/workspace.yaml resolves here, which is the migration
+# guarantee for all 46 governed workspaces — nothing changes for them.
+#
+# One-line values only. The bundled reader (policy_engine.mini_yaml_load, used
+# whenever real PyYAML is absent) refuses `>`/`|` block scalars rather than
+# silently truncating them.
+
+id: "software-engineer"
+title: "Software engineer"
+status: "stable"
+default: true
+
+persona: "A senior engineer working in a code repository — reproduces before fixing, writes the failing test first, and never pushes a diff they have not read."
+
+summary: "Source code with a real test suite. The memory bank carries the technical context and the architectural patterns; the gate runs the tests."
+
+domain_tags:
+  - software
+  - code
+  - infrastructure
+
+pipeline: "pytest (scripts/run_tests.py) via just verify-safe"
+
+example_workspaces:
+  - "@context"
+  - "@jobscraper"
+  - "@zenithcore"

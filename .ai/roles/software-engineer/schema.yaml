@@ -1,0 +1,23 @@
+# Memory bank schema — software-engineer (PH8-T02).
+#
+# ⚠️ The `required:` list below is the ONE source for what used to be hardcoded in
+# BOTH scripts/doctor.py and scripts/session_start.py. Its ORDER is part of the
+# contract: tests/test_role_packs.py asserts it equals today's seven verbatim, so
+# that if this ever stops matching, 46 workspaces changing behaviour is announced
+# by a failing test rather than discovered in the field.
+#
+# Nothing is prohibited here. This role is the superset the OS always assumed.
+
+memory:
+  required:
+    - projectbrief
+    - activeContext
+    - systemPatterns
+    - techContext
+    - decisions
+    - progress
+    - knownIssues
+  optional:
+    - INDEX
+    - codemap
+  prohibited: []

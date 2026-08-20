@@ -1,0 +1,24 @@
+# Blast-radius overlay — software-engineer (PH8-T02, consumed by PH8-T04).
+#
+# This is an OVERLAY, not a replacement for the workspace's own .ai/policy.yaml.
+# It states the domain-specific rules that follow from being a code repository;
+# the workspace policy still governs everything else. PH8-T04 is the task that
+# merges these into policy_check.py verdicts — until it ships, this file is read
+# by role_registry but not yet enforced, and doc/ROLES_SPEC.md says so.
+
+autonomous_allowed:
+  - "*.md"
+  - ".ai/memory-bank/*"
+  - "tests/*"
+
+approval_required:
+  - "requirements.txt"
+  - "package.json"
+  - "pyproject.toml"
+  - ".pre-commit-config.yaml"
+  - "justfile"
+
+always_blocked:
+  - ".env"
+  - "*.pem"
+  - "*.key"

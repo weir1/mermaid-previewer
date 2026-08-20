@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Full Page Preview</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        import svgPanZoom from 'https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js';
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+
+        const preview = document.getElementById('preview');
+        const errorMsg = document.getElementById('error');
+        const instruction = document.getElementById('instruction');
+
+        let panZoomInstance = null;
+
+        async function renderDiagram(code) {
+            if (!code || !code.trim()) return;
+
+            try {
+                errorMsg.style.display = 'none';
+                instruction.style.display = 'none';
+
+                if (panZoomInstance) {
+                    panZoomInstance.destroy();
+                    panZoomInstance = null;
+                }
+
+                const { svg } = await mermaid.render('mermaid-svg', code.trim());
+                preview.innerHTML = svg;
+
+                // Add pan and zoom capabilities to the rendered SVG
+                const svgElement = preview.querySelector('svg');
+                if (svgElement) {
+                    svgElement.style.width = '100%';
+                    svgElement.style.height = '100%';
+                    panZoomInstance = svgPanZoom(svgElement, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: true,
+                        center: true,
+                        minZoom: 0.1,
+                        maxZoom: 50
+                    });
+                }
+            } catch (err) {
+                errorMsg.textContent = err.message || err.str || 'Syntax error';
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // Listen for global paste events
+        document.addEventListener('paste', (e) => {
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            if (pastedText) {
+                renderDiagram(pastedText);
+            }
+        });
+
+        // Initial sample render to show it works
+        const sample = `graph TD\n    A[Paste your code anywhere] --> B{Cmd + V}\n    B --> C[See it full screen!]`;
+        renderDiagram(sample);
+
+    </script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            background: #ffffff;
+        }
+        #instruction {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        #error {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            color: #d9534f;
+            background: #fdf7f7;
+            padding: 15px;
+            border: 1px solid #d9534f;
+            border-radius: 8px;
+            display: none;
+            font-size: 14px;
+            white-space: pre-wrap;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #preview {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Make svg take full available space so pan-zoom can work properly */
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="instruction">⌘ + V (or Ctrl + V) anywhere to paste your Mermaid code</div>
+    <div id="error"></div>
+    <div id="preview"></div>
+</body>
+</html>

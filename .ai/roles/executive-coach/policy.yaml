@@ -1,0 +1,33 @@
+# Blast-radius overlay — executive-coach (PH8-T02, consumed by PH8-T04).
+#
+# The domain-destructive act here is NOT deleting code. It is rewriting history:
+# a training log, a measurement series, or a diet record is an irreplaceable
+# primary record — there is no re-run that regenerates last month's weigh-ins.
+# Editing today's entry is ordinary work; altering past entries is destructive in
+# a way no code change is, because the data cannot be recovered from anywhere.
+#
+# PH8-T04: policy_engine.merge_role_overlay() now enforces `approval_required` and
+# `always_blocked` below from both live call sites (policy_hook.py, policy_check.py).
+#
+# `autonomous_allowed` stays READ but NOT enforced, deliberately, not as a gap: the
+# merge is additive-only (see PH8-T04's plan, Risks) — a role pack may only ADD
+# caution to a workspace's own .ai/policy.yaml, never grant autonomy the workspace
+# didn't already have. This list documents what WOULD be safe to auto-allow in this
+# domain; wiring it would be a different, riskier kind of change than this task made.
+
+autonomous_allowed:
+  - "*.md"
+  - ".ai/memory-bank/activeContext.md"
+  - ".ai/memory-bank/progress.md"
+
+approval_required:
+  - ".ai/memory-bank/protocol.md"
+  - ".ai/memory-bank/log.md"
+  - ".ai/memory-bank/measurements.md"
+  - "measurements/*"
+  - "progress/*"
+  - "diet/*"
+
+always_blocked:
+  - ".env"
+  - "*.key"

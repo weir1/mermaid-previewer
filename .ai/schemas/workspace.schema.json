@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "God Mode AI OS — workspace.yaml (mesh declaration, PH11-T01)",
+  "description": "Structure consumed by scripts/workspace_declare.py. Validated structurally (dependency-light, no jsonschema package) by scripts/validate_os.py inside the gate. One per workspace: what it is, what it depends on, what it serves, and which North-Star ladder stage (.ai/north-star.yaml) its work advances.",
+  "type": "object",
+  "required": ["role"],
+  "properties": {
+    "role": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What this workspace is, in the operator's own words. Never guessed by the AI — the same authorship rule .ai/plan.md's 'What I want' section already holds."
+    },
+    "success_criteria": {
+      "type": "string",
+      "description": "What 'done' or 'working' looks like for this workspace. Optional — absence means undeclared, not zero."
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Workspace names this workspace's outcome depends on. Edge reciprocity is validated by a later slice (fleet-map), not this schema."
+    },
+    "serves": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Workspace names this workspace's output feeds. May be empty for infrastructure workspaces that serve everything generically — explain why in `notes` rather than inventing a false edge."
+    },
+    "ladder_stage": {
+      "type": ["integer", "null"],
+      "description": "Which .ai/north-star.yaml stage this workspace's work advances. null/absent means undeclared, never guessed — the same 'refuses rather than invents' contract north_star.score() already uses for a stage with no exit_criterion."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free text for anything the structured fields can't say honestly — e.g. why depends_on/serves is empty for an infrastructure workspace."
+    }
+  }
+}

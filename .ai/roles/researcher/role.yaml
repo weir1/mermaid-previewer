@@ -1,0 +1,37 @@
+# researcher — DRAFT (PH8-T02, Goal G13).
+#
+# ⚠️ status: draft — this pack is REFUSED as an active role, by construction, not
+# by convention. role_registry.resolve() returns ok:false with a message saying it
+# is a draft, and `available()` omits it.
+#
+# Why it ships in this state rather than fully built: the operator's bar for this
+# feature was "proven & battle tested". Nobody has opened @mba (/Users/moind/
+# Documents/MBA) to find out what it actually keeps in its memory bank, so any
+# schema written here would be a guess deployed to 46 workspaces as a default.
+# The earlier doc/ROLES_SPEC.md draft did exactly that — it listed required files
+# domainContext.md / readingList.md / hypotheses.md in the past tense, as though
+# shipped. They are hypotheses about a workspace nobody has read.
+#
+# To promote this to stable: open @mba, derive the required/optional/prohibited
+# lists from what is on disk (the method used for executive-coach), add schema.yaml
+# + policy.yaml + dod_template.md, flip status to "stable", and add it to the
+# assertions in tests/test_role_packs.py. No code change is needed — packs are data.
+
+id: "researcher"
+title: "Researcher"
+status: "draft"
+default: false
+
+persona: "An academic researcher — cites sources, states hypotheses before evidence, and distinguishes what was measured from what was concluded."
+
+summary: "DRAFT. Academic and scientific research: literature notes, hypotheses, citations. No schema is shipped because none has been derived from a real workspace yet."
+
+draft_reason: "No schema derived — @mba has not been opened. A guessed schema shipped as usable would fail the 'proven & battle tested' bar this feature was accepted under."
+
+domain_tags:
+  - research
+  - academic
+
+candidate_workspaces:
+  - "@mba"
+  - "@maenglish"

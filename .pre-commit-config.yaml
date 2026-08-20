@@ -1,0 +1,47 @@
+# God Mode AI OS — minimal pre-commit gate.
+# Deployed by onboard_project.sh when a workspace has no .pre-commit-config.yaml
+# of its own (audit P1-4 / PH6-T15): without this file `pre-commit run --all-files`
+# errors immediately, so `just verify-safe` can never write real evidence and the
+# validation gate can never be reopened. Kept dependency-light and stack-agnostic
+# (no ruff, no local test/validate hooks) so it runs to completion in ANY workspace
+# regardless of language. A workspace is free to replace this with its own config —
+# onboarding only ever creates this file when one is missing, never overwrites.
+#
+# `exclude` below is load-bearing, not cosmetic: pre-commit only touches files
+# git already tracks, and at least one fleet workspace (@anti) has a vendored
+# node_modules/ tree committed to git — a first run rewrote ~190 vendored files
+# before this exclusion existed (caught during PH6-T15 rollout, reverted).
+# Vendor/build directories must never be assumed to be gitignored.
+exclude: '(^|/)(node_modules|\.venv|venv|dist|build|vendor|target|\.next|coverage|__pycache__)/'
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # PH7-T05 — the workspace's own tests, at commit time. `run_tests.py` is stdlib
+  # only and is deployed by onboard_project.sh, so this hook has no dependency to
+  # install and cannot break the "runs to completion in ANY workspace" property
+  # above: a workspace with no tests reports `none` and exits 0. It is reported as
+  # `none` and never as a pass — see the script's docstring.
+  #
+  # NOTE: onboarding never overwrites an existing .pre-commit-config.yaml, so this
+  # hook reaches only NEWLY onboarded workspaces. The lever that reaches the
+  # existing fleet is the `verify-safe` recipe in the kernel justfile, which is
+  # merged on upgrade and runs the same script. This is the follower, not the
+  # mechanism — and `verify-safe` greps for `run_tests.py` here so the two never
+  # run the suite twice.
+  - repo: local
+    hooks:
+      - id: godmode-tests
+        name: workspace test suite (none = reported, never assumed passing)
+        entry: python3 scripts/run_tests.py --quiet
+        language: system
+        pass_filenames: false
+        always_run: true
