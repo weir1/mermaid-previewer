@@ -20,11 +20,22 @@
         const closeBtn = document.getElementById('close-btn');
         const previewContainer = document.getElementById('preview-container');
         const errorMsg = document.getElementById('error');
-        const selectAllBtn = document.getElementById('select-all-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const pasteBtn = document.getElementById('paste-btn');
 
-        selectAllBtn.addEventListener('click', () => {
+        clearBtn.addEventListener('click', () => {
+            editor.value = '';
             editor.focus();
-            editor.select();
+        });
+
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                editor.value = text;
+                editor.focus();
+            } catch (err) {
+                alert('Failed to read clipboard contents. Please ensure clipboard permissions are granted.');
+            }
         });
 
         function preprocessMermaid(code) {
@@ -354,7 +365,7 @@
         #preview-btn:hover {
             background: #0056b3;
         }
-        #select-all-btn {
+        .editor-btn {
             background: #e2e6ea;
             color: #333;
             border: 1px solid #dae0e5;
@@ -365,7 +376,7 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        #select-all-btn:hover {
+        .editor-btn:hover {
             background: #dae0e5;
         }
         #error {
@@ -475,7 +486,8 @@
         <h2>Paste Mermaid Code</h2>
         <textarea id="editor" placeholder="Paste your Mermaid code here, or drag and drop a .mmd/.txt file..."></textarea>
         <div class="editor-actions">
-            <button id="select-all-btn">Select All</button>
+            <button id="clear-btn" class="editor-btn">Clear</button>
+            <button id="paste-btn" class="editor-btn">Paste</button>
             <button id="preview-btn">Show Full Preview (Cmd+Enter)</button>
         </div>
         <div id="error"></div>
