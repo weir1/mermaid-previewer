@@ -11,3 +11,13 @@
 .ai/backups/
 __pycache__/
 *.pyc
+
+# God Mode AI OS Kernel Files
+.ai/
+.agents/
+.claude/
+scripts/
+AGENTS.md
+CLAUDE.md
+justfile
+AI_CHANGELOG.md
