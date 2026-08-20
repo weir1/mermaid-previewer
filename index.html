@@ -39,46 +39,31 @@
         });
 
         function preprocessMermaid(code) {
-            let lines = code.split('\n');
-            let inFlowchart = false;
+            if (!/^\s*(flowchart|graph)\b/m.test(code)) return code;
 
-            const nodeRegex = /([a-zA-Z0-9_]+)\s*(?:(\[\[)(.*?)(\]\])|(\[\()(.*?)(\)\])|(\[\/)(.*?)(\/\])|(\[\\)(.*?)(\\\])|(\(\[)(.*?)(\]\))|({{)(.*?)(}})|(\[)(.*?)(\])|(\()(.*?)(\))|({)(.*?)(})|(>)(.*?)(\]))/g;
+            const nodeRegex = /([a-zA-Z0-9_]+(?:-[a-zA-Z0-9_]+)*)\s*(?:(\[\[)([\s\S]*?)(\]\])|(\[\()([\s\S]*?)(\)\])|(\[\/)([\s\S]*?)(\/\])|(\[\\)([\s\S]*?)(\\\])|(\(\[)([\s\S]*?)(\]\))|({{)([\s\S]*?)(}})|(\[)([\s\S]*?)(\])|(\()([\s\S]*?)(\))|({)([\s\S]*?)(})|(>)([\s\S]*?)(\]))/g;
 
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                if (line.trim().match(/^(flowchart|graph)\b/)) {
-                    inFlowchart = true;
-                } else if (line.trim().match(/^(sequenceDiagram|classDiagram|stateDiagram|gantt|pie|journey|gitGraph|erDiagram)/)) {
-                    inFlowchart = false;
+            return code.replace(nodeRegex, (...args) => {
+                let match = args[0];
+                let id = args[1];
+                let open, text, close;
+                for (let j = 2; j <= 29; j += 3) {
+                    if (args[j] !== undefined) {
+                        open = args[j];
+                        text = args[j+1];
+                        close = args[j+2];
+                        break;
+                    }
                 }
 
-                if (inFlowchart) {
-                    line = line.replace(nodeRegex, (...args) => {
-                        let match = args[0];
-                        let id = args[1];
-                        let open, text, close;
-                        for (let j = 2; j <= 29; j += 3) {
-                            if (args[j] !== undefined) {
-                                open = args[j];
-                                text = args[j+1];
-                                close = args[j+2];
-                                break;
-                            }
-                        }
+                if (!text) return match;
 
-                        if (!text) return match;
-                        if (text.includes('-->') || text.includes('---') || text.includes('==>')) return match;
+                let isQuoted = text.startsWith('"') && text.endsWith('"') && text.length >= 2;
+                let innerText = isQuoted ? text.substring(1, text.length - 1) : text;
+                let escapedText = innerText.replace(/"/g, '#quot;');
 
-                        let isQuoted = text.startsWith('"') && text.endsWith('"') && text.length >= 2;
-                        let innerText = isQuoted ? text.substring(1, text.length - 1) : text;
-                        let escapedText = innerText.replace(/"/g, '#quot;');
-
-                        return `${id}${open}"${escapedText}"${close}`;
-                    });
-                    lines[i] = line;
-                }
-            }
-            return lines.join('\n');
+                return `${id}${open}"${escapedText}"${close}`;
+            });
         }
 
         let panZoomInstance = null;
