@@ -73,6 +73,61 @@
                 panZoomInstance = null;
             }
             previewContainer.innerHTML = ''; // Clear it out to save memory
+            // Exit fullscreen if we are in it
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
+        });
+
+        // Fullscreen API toggle
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                overlay.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+                fullscreenBtn.textContent = "Exit Fullscreen";
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.textContent = "Go Fullscreen";
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.textContent = "Go Fullscreen";
+            }
+        });
+
+        // Drag and Drop File Support
+        editor.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            editor.style.borderColor = '#007bff';
+            editor.style.background = '#e9f5ff';
+        });
+
+        editor.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            editor.style.borderColor = '#ddd';
+            editor.style.background = '#fafafa';
+        });
+
+        editor.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            editor.style.borderColor = '#ddd';
+            editor.style.background = '#fafafa';
+
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    editor.value = event.target.result;
+                };
+                reader.readAsText(file);
+            }
         });
 
     </script>
@@ -168,6 +223,23 @@
             margin: 0;
             color: #333;
         }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .secondary-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .secondary-btn:hover {
+            background: #5a6268;
+        }
         #close-btn {
             background: #dc3545;
             color: white;
@@ -198,7 +270,7 @@
 <body>
     <div class="container">
         <h2>Paste Mermaid Code</h2>
-        <textarea id="editor" placeholder="Paste your Mermaid code here..."></textarea>
+        <textarea id="editor" placeholder="Paste your Mermaid code here, or drag and drop a .mmd/.txt file..."></textarea>
         <button id="preview-btn">Show Full Preview</button>
         <div id="error"></div>
     </div>
@@ -206,7 +278,10 @@
     <div id="fullscreen-overlay">
         <div id="overlay-header">
             <h3>Mermaid Fullscreen Preview</h3>
-            <button id="close-btn">Close</button>
+            <div class="header-buttons">
+                <button id="fullscreen-btn" class="secondary-btn">Go Fullscreen</button>
+                <button id="close-btn">Close</button>
+            </div>
         </div>
         <div id="preview-container"></div>
     </div>
