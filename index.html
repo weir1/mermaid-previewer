@@ -42,7 +42,7 @@
             let lines = code.split('\n');
             let inFlowchart = false;
 
-            const nodeRegex = /([a-zA-Z0-9_]+)\s*(\[\[|\[\(|\[\/|\[\\|\(\[|{{|\[|\(|{|>)(?!\s*")(.+?)(?<!")(\]\]|\)\]|\/\]|\\\]|\]\)|}}|\]|\)|})/g;
+            const nodeRegex = /([a-zA-Z0-9_]+)\s*(?:(\[\[)(.*?)(\]\])|(\[\()(.*?)(\)\])|(\[\/)(.*?)(\/\])|(\[\\)(.*?)(\\\])|(\(\[)(.*?)(\]\))|({{)(.*?)(}})|(\[)(.*?)(\])|(\()(.*?)(\))|({)(.*?)(})|(>)(.*?)(\]))/g;
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
@@ -53,9 +53,26 @@
                 }
 
                 if (inFlowchart) {
-                    line = line.replace(nodeRegex, (match, id, open, text, close) => {
+                    line = line.replace(nodeRegex, (...args) => {
+                        let match = args[0];
+                        let id = args[1];
+                        let open, text, close;
+                        for (let j = 2; j <= 29; j += 3) {
+                            if (args[j] !== undefined) {
+                                open = args[j];
+                                text = args[j+1];
+                                close = args[j+2];
+                                break;
+                            }
+                        }
+
+                        if (!text) return match;
                         if (text.includes('-->') || text.includes('---') || text.includes('==>')) return match;
-                        let escapedText = text.replace(/"/g, '#quot;');
+
+                        let isQuoted = text.startsWith('"') && text.endsWith('"') && text.length >= 2;
+                        let innerText = isQuoted ? text.substring(1, text.length - 1) : text;
+                        let escapedText = innerText.replace(/"/g, '#quot;');
+
                         return `${id}${open}"${escapedText}"${close}`;
                     });
                     lines[i] = line;
