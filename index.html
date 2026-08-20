@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mermaid Editor & Previewer</title>
+    <meta name="description" content="A fast, zero-setup live editor and previewer for Mermaid diagrams. Create, edit, and instantly visualize flowcharts, sequence diagrams, and more.">
+    <meta name="keywords" content="mermaid, diagrams, flowchart, live editor, previewer, moin dalal">
+    <meta name="author" content="Moin Dalal">
+    <title>Moin Mermaid Previewer</title>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
@@ -504,24 +507,24 @@
         <div class="editor-actions">
             <button id="clear-btn" class="editor-btn">Clear</button>
             <button id="paste-btn" class="editor-btn">Paste</button>
-            <button id="preview-btn">Show Full Preview (Cmd+Enter)</button>
+            <button id="preview-btn">Show Full Preview (Ctrl/Cmd+Enter)</button>
         </div>
         <div id="error"></div>
 
         <div class="guide">
             <h4>💡 Quick Guide</h4>
             <ul>
-                <li><strong>Cmd + Enter:</strong> Show Preview</li>
+                <li><strong>Ctrl/Cmd + Enter:</strong> Show Preview</li>
                 <li><strong>Drag & Drop:</strong> Load a `.mmd` or `.txt` file</li>
                 <li><strong>F:</strong> Toggle Fullscreen (while in preview)</li>
                 <li><strong>Esc:</strong> Close Preview</li>
                 <li><strong>Arrows / Scroll:</strong> Pan around diagram</li>
-                <li><strong>Cmd + Scroll / Pinch:</strong> Zoom diagram</li>
+                <li><strong>Ctrl/Cmd + Scroll / Pinch:</strong> Zoom diagram</li>
             </ul>
         </div>
 
         <div class="footer">
-            Developed by <strong>Moin Dalal</strong> | Version <span id="app-version">0.1.0</span>
+            Developed by <strong><a href="https://bymoin.com" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">Moin Dalal</a></strong> | Version <span id="app-version">0.1.0</span>
         </div>
     </div>
 
