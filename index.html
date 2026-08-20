@@ -21,10 +21,36 @@
         const previewContainer = document.getElementById('preview-container');
         const errorMsg = document.getElementById('error');
 
+        function preprocessMermaid(code) {
+            let lines = code.split('\n');
+            let inFlowchart = false;
+
+            const nodeRegex = /([a-zA-Z0-9_]+)\s*(\[\[|\[\(|\[\/|\[\\|\(\[|{{|\[|\(|{|>)(?!\s*")(.+?)(?<!")(\]\]|\)\]|\/\]|\\\]|\]\)|}}|\]|\)|})/g;
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+                if (line.trim().match(/^(flowchart|graph)\b/)) {
+                    inFlowchart = true;
+                } else if (line.trim().match(/^(sequenceDiagram|classDiagram|stateDiagram|gantt|pie|journey|gitGraph|erDiagram)/)) {
+                    inFlowchart = false;
+                }
+
+                if (inFlowchart) {
+                    line = line.replace(nodeRegex, (match, id, open, text, close) => {
+                        if (text.includes('-->') || text.includes('---') || text.includes('==>')) return match;
+                        let escapedText = text.replace(/"/g, '#quot;');
+                        return `${id}${open}"${escapedText}"${close}`;
+                    });
+                    lines[i] = line;
+                }
+            }
+            return lines.join('\n');
+        }
+
         let panZoomInstance = null;
 
         previewBtn.addEventListener('click', async () => {
-            const code = editor.value.trim();
+            let code = editor.value.trim();
             if (!code) {
                 errorMsg.textContent = "Please enter some Mermaid code first.";
                 errorMsg.style.display = 'block';
@@ -38,6 +64,8 @@
                     panZoomInstance.destroy();
                     panZoomInstance = null;
                 }
+
+                code = preprocessMermaid(code);
 
                 // Render the diagram
                 const { svg } = await mermaid.render('mermaid-svg', code);
