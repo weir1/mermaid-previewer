@@ -1,7 +1,7 @@
 ---
 version: 3.9.0
-updated: 2026-08-20 12:15 IST
-revisions: 2
+updated: 2026-08-20 12:40 IST
+revisions: 3
 updated_basis: git
 ---
 # Mermaid Previewer 🧜‍♀️
@@ -34,12 +34,12 @@ A lightning-fast, zero-setup local tool for instantly previewing [Mermaid](https
    ```
    This will automatically spin up a lightweight background server and open `http://localhost:8000/index.html` in your default browser.
 
-### Desktop Shortcut (Mac Only)
-If you want to use the app without touching the terminal, you can generate a desktop shortcut:
+### Desktop Shortcut & Spotlight (Mac Only)
+If you want to use the app without touching the terminal and want to launch it directly from **Spotlight** (Cmd + Space), you can install the native shortcut:
 ```bash
-osacompile -e 'do shell script "cd '`pwd`' && nohup /usr/bin/python3 run.py >/dev/null 2>&1 &"' -o ~/Desktop/MermaidPreviewer.app
+./install_app.sh
 ```
-Double-click the new `MermaidPreviewer.app` on your desktop anytime you want to launch the tool!
+This will create a `MermaidPreviewer.app` bundle in your `~/Applications` folder. You can now launch it anytime from Spotlight, and it will silently start the server (if not already running) and open your browser!
 
 ## ⌨️ Shortcuts & Cheatsheet
 
