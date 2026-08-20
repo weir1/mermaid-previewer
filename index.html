@@ -157,6 +157,31 @@
             }
         });
 
+        // Keyboard Arrow Panning
+        document.addEventListener('keydown', (e) => {
+            if (overlay.style.display === 'flex' && panZoomInstance) {
+                const panStep = 50; // pixels to pan per keypress
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        panZoomInstance.panBy({x: panStep, y: 0});
+                        e.preventDefault();
+                        break;
+                    case 'ArrowRight':
+                        panZoomInstance.panBy({x: -panStep, y: 0});
+                        e.preventDefault();
+                        break;
+                    case 'ArrowUp':
+                        panZoomInstance.panBy({x: 0, y: panStep});
+                        e.preventDefault();
+                        break;
+                    case 'ArrowDown':
+                        panZoomInstance.panBy({x: 0, y: -panStep});
+                        e.preventDefault();
+                        break;
+                }
+            }
+        });
+
     </script>
     <style>
         body, html {
