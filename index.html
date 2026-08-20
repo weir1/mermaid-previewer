@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mermaid Full Page Preview</title>
+    <title>Mermaid Editor & Previewer</title>
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         import svgPanZoom from 'https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js';
@@ -14,31 +14,40 @@
             securityLevel: 'loose'
         });
 
-        const preview = document.getElementById('preview');
+        const editor = document.getElementById('editor');
+        const previewBtn = document.getElementById('preview-btn');
+        const overlay = document.getElementById('fullscreen-overlay');
+        const closeBtn = document.getElementById('close-btn');
+        const previewContainer = document.getElementById('preview-container');
         const errorMsg = document.getElementById('error');
-        const instruction = document.getElementById('instruction');
-        const pasteBtn = document.getElementById('paste-btn');
-        const hiddenInput = document.getElementById('hidden-input');
 
         let panZoomInstance = null;
 
-        async function renderDiagram(code) {
-            if (!code || !code.trim()) return;
+        previewBtn.addEventListener('click', async () => {
+            const code = editor.value.trim();
+            if (!code) {
+                errorMsg.textContent = "Please enter some Mermaid code first.";
+                errorMsg.style.display = 'block';
+                return;
+            }
 
             try {
                 errorMsg.style.display = 'none';
-                instruction.style.display = 'none';
 
                 if (panZoomInstance) {
                     panZoomInstance.destroy();
                     panZoomInstance = null;
                 }
 
-                const { svg } = await mermaid.render('mermaid-svg', code.trim());
-                preview.innerHTML = svg;
+                // Render the diagram
+                const { svg } = await mermaid.render('mermaid-svg', code);
+                previewContainer.innerHTML = svg;
+
+                // Show overlay
+                overlay.style.display = 'flex';
 
                 // Add pan and zoom capabilities to the rendered SVG
-                const svgElement = preview.querySelector('svg');
+                const svgElement = previewContainer.querySelector('svg');
                 if (svgElement) {
                     svgElement.style.width = '100%';
                     svgElement.style.height = '100%';
@@ -55,92 +64,127 @@
                 errorMsg.textContent = err.message || err.str || 'Syntax error';
                 errorMsg.style.display = 'block';
             }
-        }
-
-        // 1. Listen for global paste events (Cmd+V)
-        window.addEventListener('paste', (e) => {
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-            if (pastedText) {
-                renderDiagram(pastedText);
-            }
         });
 
-        // 2. Button for explicitly reading clipboard
-        pasteBtn.addEventListener('click', async () => {
-            try {
-                const text = await navigator.clipboard.readText();
-                if (text) {
-                    renderDiagram(text);
-                } else {
-                    alert("Clipboard is empty or contains no text.");
-                }
-            } catch (err) {
-                // Fallback for browsers that block clipboard API
-                hiddenInput.style.display = 'block';
-                hiddenInput.focus();
-                alert("Please press Cmd+V to paste into the box.");
+        closeBtn.addEventListener('click', () => {
+            overlay.style.display = 'none';
+            if (panZoomInstance) {
+                panZoomInstance.destroy();
+                panZoomInstance = null;
             }
+            previewContainer.innerHTML = ''; // Clear it out to save memory
         });
-
-        // 3. Fallback hidden input just in case
-        hiddenInput.addEventListener('input', (e) => {
-            if (hiddenInput.value) {
-                renderDiagram(hiddenInput.value);
-                hiddenInput.value = '';
-                hiddenInput.style.display = 'none';
-            }
-        });
-
-        // Initial sample render
-        const sample = `graph TD\n    A[Click 'Paste from Clipboard' below] --> B{Or press Cmd + V}\n    B --> C[See it full screen!]`;
-        renderDiagram(sample);
 
     </script>
     <style>
         body, html {
             margin: 0;
             padding: 0;
-            width: 100vw;
             height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            margin-top: 50px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            resize: vertical;
+            border: 1px solid #ddd;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 15px;
+            border-radius: 8px;
+            outline: none;
+            box-sizing: border-box;
+            background: #fafafa;
+        }
+        textarea:focus {
+            border-color: #007bff;
             background: #ffffff;
         }
-        #instruction {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
+        #preview-btn {
+            margin-top: 20px;
+            align-self: flex-end;
+            background: #007bff;
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            z-index: 100;
-            pointer-events: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #preview-btn:hover {
+            background: #0056b3;
         }
         #error {
-            position: absolute;
-            bottom: 80px;
-            left: 20px;
-            right: 20px;
             color: #d9534f;
             background: #fdf7f7;
             padding: 15px;
+            margin-top: 20px;
             border: 1px solid #d9534f;
             border-radius: 8px;
             display: none;
             font-size: 14px;
             white-space: pre-wrap;
-            z-index: 100;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            max-height: 200px;
-            overflow-y: auto;
         }
-        #preview {
+
+        /* Fullscreen Overlay Styles */
+        #fullscreen-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: white;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+        #overlay-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #overlay-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        #close-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #close-btn:hover {
+            background: #c82333;
+        }
+        #preview-container {
+            flex: 1;
             width: 100vw;
-            height: 100vh;
+            overflow: hidden; /* Pan zoom handles this */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -149,42 +193,22 @@
             width: 100%;
             height: 100%;
         }
-        #paste-btn {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 24px;
-            font-size: 16px;
-            cursor: pointer;
-            z-index: 200;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: background 0.2s;
-        }
-        #paste-btn:hover {
-            background: #0056b3;
-        }
-        #hidden-input {
-            position: absolute;
-            bottom: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 300;
-            display: none;
-            padding: 10px;
-            width: 300px;
-        }
     </style>
 </head>
 <body>
-    <div id="instruction">Paste your Mermaid code to render</div>
-    <div id="error"></div>
-    <div id="preview"></div>
-    <button id="paste-btn">📋 Paste from Clipboard</button>
-    <textarea id="hidden-input" placeholder="Paste here (Cmd+V)"></textarea>
+    <div class="container">
+        <h2>Paste Mermaid Code</h2>
+        <textarea id="editor" placeholder="Paste your Mermaid code here..."></textarea>
+        <button id="preview-btn">Show Full Preview</button>
+        <div id="error"></div>
+    </div>
+
+    <div id="fullscreen-overlay">
+        <div id="overlay-header">
+            <h3>Mermaid Fullscreen Preview</h3>
+            <button id="close-btn">Close</button>
+        </div>
+        <div id="preview-container"></div>
+    </div>
 </body>
 </html>
