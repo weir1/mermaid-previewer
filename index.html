@@ -139,7 +139,29 @@
                     });
                 }
             } catch (err) {
-                errorMsg.textContent = err.message || err.str || 'Syntax error';
+                const fullError = `🚨 Mermaid Syntax Error:\n\n${err.message || err.str || 'Syntax error'}`;
+                errorMsg.innerHTML = '';
+
+                const errText = document.createElement('div');
+                errText.style.marginRight = '40px';
+                errText.textContent = fullError;
+
+                const copyErrBtn = document.createElement('button');
+                copyErrBtn.textContent = 'Copy';
+                copyErrBtn.className = 'editor-btn';
+                copyErrBtn.style.position = 'absolute';
+                copyErrBtn.style.top = '10px';
+                copyErrBtn.style.right = '10px';
+                copyErrBtn.style.padding = '4px 8px';
+                copyErrBtn.style.fontSize = '12px';
+                copyErrBtn.onclick = () => {
+                    navigator.clipboard.writeText(fullError);
+                    copyErrBtn.textContent = 'Copied!';
+                    setTimeout(() => copyErrBtn.textContent = 'Copy', 2000);
+                };
+
+                errorMsg.appendChild(errText);
+                errorMsg.appendChild(copyErrBtn);
                 errorMsg.style.display = 'block';
             }
         });
@@ -394,6 +416,7 @@
             display: none;
             font-size: 14px;
             white-space: pre-wrap;
+            position: relative;
         }
 
         /* Guide Styles */
@@ -496,13 +519,13 @@
 </head>
 <body>
     <div class="container">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <a href="/" style="text-decoration: none; display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
             <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="100" height="100" rx="20" fill="#007bff"/>
                 <path d="M30 70V30L50 50L70 30V70" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <h2 style="margin: 0; color: #333;">Moin Mermaid Previewer</h2>
-        </div>
+        </a>
         <textarea id="editor" placeholder="Paste your Mermaid code here, or drag and drop a .mmd/.txt file..."></textarea>
         <div class="editor-actions">
             <button id="clear-btn" class="editor-btn">Clear</button>
