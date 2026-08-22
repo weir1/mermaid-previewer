@@ -84,9 +84,34 @@
         function preprocessMermaid(code) {
             if (!/^\s*(flowchart|graph)\b/m.test(code)) return code;
 
+            // 1. Fix old edge syntax with quotes inside pipes: A -->|"text"| B to A -- "text" --> B
+            code = code.replace(/(-->|-\.->|==>)\s*\|"([^"]+)"\|/g, (match, arrow, text) => {
+                if (arrow === '-->') return `-- "${text}" -->`;
+                if (arrow === '-.->') return `-. "${text}" .->`;
+                if (arrow === '==>') return `== "${text}" ==>`;
+                return match;
+            });
+
+            // Fix unquoted pipe labels too, wrapping them in quotes in the modern syntax
+            code = code.replace(/(-->|-\.->|==>)\s*\|([^|"]+)\|/g, (match, arrow, text) => {
+                let cleanText = text.trim().replace(/"/g, '#quot;');
+                if (arrow === '-->') return `-- "${cleanText}" -->`;
+                if (arrow === '-.->') return `-. "${cleanText}" .->`;
+                if (arrow === '==>') return `== "${cleanText}" ==>`;
+                return match;
+            });
+
+            // Extract all string literals so they aren't messed up by nodeRegex
+            let strings = [];
+            code = code.replace(/"[^"]*"/g, match => {
+                strings.push(match);
+                return `__STR_${strings.length - 1}__`;
+            });
+
+            // 2. Normalize node labels to ensure they are wrapped in quotes
             const nodeRegex = /([a-zA-Z0-9_]+(?:-[a-zA-Z0-9_]+)*)\s*(?:(\[\[)([\s\S]*?)(\]\])|(\[\()([\s\S]*?)(\)\])|(\[\/)([\s\S]*?)(\/\])|(\[\\)([\s\S]*?)(\\\])|(\(\[)([\s\S]*?)(\]\))|({{)([\s\S]*?)(}})|(\[)([\s\S]*?)(\])|(\()([\s\S]*?)(\))|({)([\s\S]*?)(})|(>)([\s\S]*?)(\]))/g;
 
-            return code.replace(nodeRegex, (...args) => {
+            code = code.replace(nodeRegex, (...args) => {
                 let match = args[0];
                 let id = args[1];
                 let open, text, close;
@@ -101,12 +126,41 @@
 
                 if (!text) return match;
 
-                let isQuoted = text.startsWith('"') && text.endsWith('"') && text.length >= 2;
-                let innerText = isQuoted ? text.substring(1, text.length - 1) : text;
-                let escapedText = innerText.replace(/"/g, '#quot;');
+                // Since strings are extracted, if the text WAS quoted, it's now __STR_X__
+                if (text.match(/^__STR_\d+__$/)) {
+                     return `${id}${open}${text}${close}`;
+                }
 
+                let escapedText = text.replace(/"/g, '#quot;');
                 return `${id}${open}"${escapedText}"${close}`;
             });
+
+            // Restore strings
+            code = code.replace(/__STR_(\d+)__/g, (match, p1) => {
+                return strings[p1];
+            });
+
+            // 3. Replace \n or actual newlines with <br/> inside strings
+            let inString = false;
+            let result = '';
+            for (let i = 0; i < code.length; i++) {
+                if (code[i] === '"' && (i === 0 || code[i-1] !== '\\')) {
+                    inString = !inString;
+                    result += code[i];
+                } else if (inString) {
+                    if (code[i] === '\n') {
+                        result += '<br/>';
+                    } else if (code[i] === '\\' && code[i+1] === 'n') {
+                        result += '<br/>';
+                        i++; // skip 'n'
+                    } else {
+                        result += code[i];
+                    }
+                } else {
+                    result += code[i];
+                }
+            }
+            return result;
         }
 
         let panZoomInstance = null;
@@ -588,7 +642,7 @@
         </div>
 
         <div class="footer">
-            Developed by <strong><a href="https://bymoin.com" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">Moin Dalal</a></strong> | Version <span id="app-version">0.1.0</span>
+            Developed by <strong><a href="https://bymoin.com" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">Moin Dalal</a></strong> | Version <span id="app-version">0.1.1</span>
         </div>
     </div>
 
